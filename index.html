@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sid · Dashboard Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #080d1a;
+      --glass:  rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.09);
+      --text:   #e2e8f0;
+      --muted:  #64748b;
+      --soft:   #94a3b8;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100dvh;
+      padding: 24px 16px 48px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ambient glow layers */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before {
+      width: 600px; height: 600px;
+      top: -180px; left: -180px;
+      background: radial-gradient(circle, rgba(33,184,147,0.07) 0%, transparent 70%);
+    }
+    body::after {
+      width: 500px; height: 500px;
+      bottom: -160px; right: -160px;
+      background: radial-gradient(circle, rgba(124,58,237,0.07) 0%, transparent 70%);
+    }
+
+    .wrap {
+      max-width: 680px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── HEADER ── */
+    header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 28px;
+    }
+
+    .avatar {
+      flex-shrink: 0;
+      width: 46px; height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, #21b893 0%, #0ea5e9 100%);
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+      box-shadow: 0 0 20px rgba(33,184,147,0.3);
+    }
+
+    .header-text h1 {
+      font-size: 19px;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.4px;
+    }
+    .header-text p {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .header-clock {
+      margin-left: auto;
+      text-align: right;
+      flex-shrink: 0;
+    }
+    #clock {
+      font-size: 20px;
+      font-weight: 700;
+      color: #21b893;
+      letter-spacing: -0.5px;
+      font-variant-numeric: tabular-nums;
+    }
+    #dateline {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── GRID ── */
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      display: block;
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      text-decoration: none;
+      color: var(--text);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* coloured top line */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent, #21b893);
+      border-radius: 18px 18px 0 0;
+      opacity: 0.9;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      background: rgba(255,255,255,0.06);
+      border-color: var(--accent, #21b893);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+    }
+    .card:active {
+      transform: scale(0.97);
+      transition-duration: 0.08s;
+    }
+
+    /* ── CARD INTERNALS ── */
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .card-icon {
+      font-size: 26px;
+      line-height: 1;
+    }
+
+    .badges {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .badge {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 99px;
+    }
+    .badge-new {
+      background: rgba(33,184,147,0.15);
+      color: #21b893;
+      border: 1px solid rgba(33,184,147,0.25);
+    }
+    .badge-retired {
+      background: rgba(100,116,139,0.15);
+      color: #64748b;
+      border: 1px solid rgba(100,116,139,0.2);
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 5px;
+    }
+
+    .card-desc {
+      font-size: 11.5px;
+      color: var(--soft);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 16px;
+    }
+    .tag {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 99px;
+      background: rgba(255,255,255,0.05);
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+
+    .card-cta {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent, #21b893);
+      transition: gap 0.15s;
+    }
+    .card-cta .arrow {
+      display: inline-block;
+      transition: transform 0.15s;
+    }
+    .card:hover .card-cta .arrow {
+      transform: translateX(4px);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      margin-top: 32px;
+      text-align: center;
+    }
+    .footer-tip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #334155;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 6px 14px;
+    }
+    .footer-tip .dot {
+      color: #21b893;
+      font-size: 8px;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 460px) {
+      .grid { grid-template-columns: 1fr; }
+      header { padding-bottom: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header>
+      <div class="avatar">S</div>
+      <div class="header-text">
+        <h1>Dashboard Hub</h1>
+        <p>lexitools.tech workspace</p>
+      </div>
+      <div class="header-clock">
+        <div id="clock">--:--</div>
+        <div id="dateline"></div>
+      </div>
+    </header>
+
+    <div class="section-label">Your dashboards</div>
+
+    <div class="grid">
+
+      <!-- 1 · LexiTools Mission Control (NEW) -->
+      <a class="card" href="https://dash.lexitools.tech/" style="--accent:#21b893">
+        <div class="card-top">
+          <span class="card-icon">⚡</span>
+          <div class="badges"><span class="badge badge-new">New</span></div>
+        </div>
+        <div class="card-title">Claude Mission Control</div>
+        <div class="card-desc">Morning brief, live weather, task tracker & AI news feed.</div>
+        <div class="tags">
+          <span class="tag">Personal</span>
+          <span class="tag">Live Data</span>
+          <span class="tag">AI Feed</span>
+        </div>
+        <div class="card-cta">Open <span class="arrow">→</span></div>
+      </a>
+
+      <!-- 2 · Mission Control (Agent Ops) -->
+      <a class="card" href="https://missioncontrol.lexitools.tech/" style="--accent:#7C3AED">
+        <div class="card-top">
+          <span class="card-icon">🤖</span>
+          <div class="badges"></div>
+        </div>
+        <div class="card-title">Openclaw Mission Control</div>
+        <div class="card-desc">OpenClaw agent ops — tasks, cron jobs & execution pulse.</div>
+        <div class="tags">
+          <span class="tag">Agents</span>
+          <span class="tag">Ops</span>
+          <span class="tag">Supabase</span>
+        </div>
+        <div class="card-cta">Open <span class="arrow">→</span></div>
+      </a>
+
+      <!-- 3 · Campaign Manager -->
+      <a class="card" href="https://campaign.lexitools.tech/" style="--accent:#EC008C">
+        <div class="card-top">
+          <span class="card-icon">📊</span>
+          <div class="badges"></div>
+        </div>
+        <div class="card-title">Campaign Manager</div>
+        <div class="card-desc">Swathi Instashop workflow with shareable campaign filter links.</div>
+        <div class="tags">
+          <span class="tag">Instashop</span>
+          <span class="tag">Campaigns</span>
+          <span class="tag">Kanban</span>
+        </div>
+        <div class="card-cta">Open <span class="arrow">→</span></div>
+      </a>
+
+    </div>
+
+    <footer>
+      <div class="footer-tip">
+        <span class="dot">●</span>
+        dash.lexitools.tech
+        <span class="dot">●</span>
+        iPhone: Share → Add to Home Screen
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    function tick() {
+      const n = new Date();
+      document.getElementById('clock').textContent =
+        n.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+      document.getElementById('dateline').textContent =
+        n.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+    }
+    tick();
+    setInterval(tick, 10000);
+  </script>
+</body>
+</html>
